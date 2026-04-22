@@ -75,16 +75,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Usuário não existe",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErroResponse"
-                }
-              }
-            }
           }
         }
       }
@@ -123,6 +113,16 @@
           },
           "400": {
             "description": "Token não informado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token inválido ou expirado",
             "content": {
               "application/json": {
                 "schema": {
@@ -222,7 +222,6 @@
               },
               "example": {
                 "nome": "João",
-                "biografia": "Minha bio aqui",
                 "email": "j@j.com",
                 "usuario": "joao",
                 "senha": "123"
@@ -252,8 +251,18 @@
               }
             }
           },
+          "405": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroResponse"
+                }
+              }
+            }
+          },
           "409": {
-            "description": "E-mail já cadastrado",
+            "description": "Usuário já cadastrado",
             "content": {
               "application/json": {
                 "schema": {
@@ -305,6 +314,16 @@
               }
             }
           },
+          "403": {
+            "description": "Acesso negado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Usuário não encontrado",
             "content": {
@@ -322,7 +341,7 @@
           }
         ]
       },
-      "put": {
+      "patch": {
         "tags": [
           "usuarios"
         ],
@@ -387,7 +406,7 @@
             }
           },
           "404": {
-            "description": "Usuário não existe",
+            "description": "Usuário já existe",
             "content": {
               "application/json": {
                 "schema": {
@@ -442,8 +461,8 @@
               }
             }
           },
-          "404": {
-            "description": "Usuário não existe",
+          "403": {
+            "description": "Acesso negado",
             "content": {
               "application/json": {
                 "schema": {
@@ -489,9 +508,6 @@
           "mensagem": {
             "type": "string",
             "example": "Mensagem de retorno"
-          },
-          "dados": {
-            "type": "object"
           }
         }
       },
@@ -499,8 +515,7 @@
         "example": {
           "status": "erro",
           "codigo": "CODIGO_ERRO",
-          "mensagem": "Descrição do erro",
-          "dados": {}
+          "mensagem": "Descrição do erro"
         },
         "allOf": [
           {
@@ -562,14 +577,13 @@
       "CadastroRequest": {
         "required": [
           "email",
-          "nome_completo",
-          "biografia",
+          "nome",
           "senha",
           "usuario"
         ],
         "type": "object",
         "properties": {
-          "nome_completo": {
+          "nome": {
             "type": "string",
             "example": "João da Silva"
           },
@@ -602,13 +616,7 @@
         "example": {
           "status": "sucesso",
           "codigo": "USUARIO_CRIADO",
-          "mensagem": "Usuário cadastrado com sucesso",
-          "dados": {
-            "id": "1",
-            "nome": "João",
-            "email": "j@j.com",
-            "usuario": "joao"
-          }
+          "mensagem": "Usuário cadastrado com sucesso"
         },
         "allOf": [
           {
@@ -627,12 +635,12 @@
       "AtualizacaoRequest": {
         "required": [
           "email",
-          "nome_completo",
+          "nome",
           "usuario"
         ],
         "type": "object",
         "properties": {
-          "nome_completo": {
+          "nome": {
             "type": "string",
             "example": "João da Silva"
           },
@@ -756,7 +764,8 @@
             "id": "1",
             "nome": "João",
             "email": "j@j.com",
-            "usuario": "joao"
+            "usuario": "joao",
+            "biografia": "Desenvolvedor Java e entusiasta de astronomia."
           }
         }
       }
