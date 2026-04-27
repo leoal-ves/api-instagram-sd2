@@ -1,0 +1,538 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Instagram API - Clone",
+    "description": "API REST do clone do Instagram, com suporte a múltiplos frameworks. Todas as requisições seguras utilizam JWT via Bearer Token. As respostas aderem a um envelopamento padronizado: `{ status, codigo, mensagem, dados }`.",
+    "version": "2.0.0",
+    "contact": {
+      "name": "Equipe de Arquitetura",
+      "email": "dev@instagramclone.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/api",
+      "description": "Servidor de Desenvolvimento Local"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Operações de Autenticação e Sessão"
+    },
+    {
+      "name": "Usuarios",
+      "description": "Gestão de Usuários e Perfis"
+    },
+    {
+      "name": "Social",
+      "description": "Rede de Contatos: Seguidores e Seguindo"
+    },
+    {
+      "name": "Postagens",
+      "description": "Gestão de Postagens (Feed e Fotos)"
+    },
+    {
+      "name": "Interacoes",
+      "description": "Curtidas e Comentários nas Postagens"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Envie o token retornado no login no formato `Bearer <seu_token>`."
+      }
+    },
+    "schemas": {
+      "DefaultResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["sucesso", "erro"],
+            "description": "Indica o status geral da operação."
+          },
+          "codigo": {
+            "type": "string",
+            "description": "Código interno identificador (ex: OPERACAO_SUCESSO, POST_NAO_ENCONTRADO)."
+          },
+          "mensagem": {
+            "type": "string",
+            "description": "Mensagem amigável para exibição ao usuário."
+          },
+          "dados": {
+            "type": "object",
+            "description": "Payload com os dados da resposta, opcional em caso de erro."
+          }
+        },
+        "required": ["status", "codigo", "mensagem"]
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "usuario": {
+            "type": "string",
+            "description": "Nome de usuário"
+          },
+          "senha": {
+            "type": "string",
+            "description": "Senha da conta",
+            "format": "password"
+          }
+        },
+        "required": ["usuario", "senha"]
+      },
+      "CadastroUsuarioRequest": {
+        "type": "object",
+        "properties": {
+          "nome_completo": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 60,
+            "pattern": "^[A-Za-zÀ-ÿ\\s]+$",
+            "description": "Apenas letras e espaços."
+          },
+          "usuario": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 30,
+            "pattern": "^[a-z0-9_]+$",
+            "description": "Apenas letras minúsculas, números e underline."
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "minLength": 10,
+            "maxLength": 35
+          },
+          "senha": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 24,
+            "pattern": "^[a-zA-Z0-9]+$",
+            "format": "password",
+            "description": "Apenas letras e números."
+          }
+        },
+        "required": ["nome_completo", "usuario", "email", "senha"]
+      },
+      "AtualizarPerfilRequest": {
+        "type": "object",
+        "properties": {
+          "nome_completo": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 60,
+            "pattern": "^[A-Za-zÀ-ÿ\\s]+$"
+          },
+          "usuario": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 30,
+            "pattern": "^[a-z0-9_]+$"
+          },
+          "biografia": {
+            "type": "string",
+            "maxLength": 150
+          },
+          "foto_url": {
+            "type": "string",
+            "description": "Apenas para referência URL no PATCH, ou envio multipart em outra etapa."
+          }
+        }
+      },
+      "ComentarioRequest": {
+        "type": "object",
+        "properties": {
+          "texto": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": ["texto"]
+      },
+      "EdicaoPostagemRequest": {
+        "type": "object",
+        "properties": {
+          "legenda": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 200,
+            "pattern": "^[a-zA-Z\\s]+$",
+            "description": "Sem acentos ou caracteres especiais"
+          }
+        },
+        "required": ["legenda"]
+      }
+    }
+  },
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Realizar Login",
+        "description": "Valida as credenciais (RF02) e retorna o Token JWT via corpo da resposta na propriedade dados.token.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login bem-sucedido"
+          },
+          "401": {
+            "description": "Credenciais Inválidas"
+          }
+        }
+      }
+    },
+    "/usuarios": {
+      "post": {
+        "tags": ["Usuarios"],
+        "summary": "Cadastro de Usuário",
+        "description": "Cria um novo usuário seguindo as validações de campos estritas estipuladas no RNF02.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CadastroUsuarioRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuário criado"
+          },
+          "400": {
+            "description": "Erros de validação (Zod/Regex)"
+          }
+        }
+      }
+    },
+    "/usuarios/me": {
+      "patch": {
+        "tags": ["Usuarios"],
+        "summary": "Editar Perfil (RF09)",
+        "description": "Atualiza informações do usuário autenticado logado. Permite envio parcial dos dados.",
+        "security": [{"BearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AtualizarPerfilRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Perfil atualizado com sucesso"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Usuarios"],
+        "summary": "Desativar Conta (RF01)",
+        "description": "Realiza o soft delete do usuário que realizou a requisição (invalida acesso futuro).",
+        "security": [{"BearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Conta desativada"
+          }
+        }
+      }
+    },
+    "/usuarios/{id}": {
+      "get": {
+        "tags": ["Usuarios"],
+        "summary": "Ver Perfil (RF10)",
+        "description": "Retorna detalhes públicos do usuário mais a contagem de seguidores e seguindo (RF06).",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Perfil encontrado"
+          }
+        }
+      }
+    },
+    "/usuarios/{id}/seguir": {
+      "post": {
+        "tags": ["Social"],
+        "summary": "Seguir Usuário (RF04, RF05)",
+        "description": "Estabelece relação de seguimento. Falha caso o usuário tente seguir a si mesmo.",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Seguindo com sucesso"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Social"],
+        "summary": "Deixar de Seguir (RF04)",
+        "description": "Remove a relação de seguimento.",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deixou de seguir"
+          }
+        }
+      }
+    },
+    "/usuarios/{id}/seguidores": {
+      "get": {
+        "tags": ["Social"],
+        "summary": "Listar Seguidores (RF08)",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Lista de seguidores" }
+        }
+      }
+    },
+    "/usuarios/{id}/seguindo": {
+      "get": {
+        "tags": ["Social"],
+        "summary": "Listar Seguindo (RF08)",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Lista de seguidos" }
+        }
+      }
+    },
+    "/postagens/feed": {
+      "get": {
+        "tags": ["Postagens"],
+        "summary": "Carregar Feed (RF07)",
+        "description": "Retorna publicações dos usuários que o usuário logado segue, em ordem decrescente.",
+        "security": [{"BearerAuth": []}],
+        "responses": {
+          "200": { "description": "Lista de postagens do feed" }
+        }
+      }
+    },
+    "/postagens": {
+      "post": {
+        "tags": ["Postagens"],
+        "summary": "Criar Postagem (RNF03, RNF05, RNF06)",
+        "description": "Recebe imagem via multipart form-data. Restringe formatos e tamanho e exige validação da legenda.",
+        "security": [{"BearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "foto": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Arquivo de imagem (JPG, JPEG, PNG). Máx 10MB."
+                  },
+                  "legenda": {
+                    "type": "string",
+                    "description": "Legenda entre 5 e 200 caracteres, sem caracteres especiais."
+                  }
+                },
+                "required": ["foto"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Postagem criada com sucesso" }
+        }
+      }
+    },
+    "/postagens/{id}": {
+      "patch": {
+        "tags": ["Postagens"],
+        "summary": "Editar Legenda (RNF07)",
+        "description": "Modifica apenas a legenda, mantendo a foto intacta.",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EdicaoPostagemRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Legenda atualizada" }
+        }
+      },
+      "delete": {
+        "tags": ["Postagens"],
+        "summary": "Excluir Postagem (RNF08)",
+        "description": "Remove a postagem na íntegra. Não é permitido remover apenas a foto.",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Postagem removida" }
+        }
+      }
+    },
+    "/postagens/{id}/curtidas": {
+      "post": {
+        "tags": ["Interacoes"],
+        "summary": "Curtir Postagem (RNF09)",
+        "description": "Adiciona a curtida do usuário na postagem.",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Curtida registrada. Retorna contagem total de curtidas (RNF10)." },
+          "400": { "description": "Já curtido" }
+        }
+      },
+      "delete": {
+        "tags": ["Interacoes"],
+        "summary": "Descurtir Postagem (RNF09)",
+        "description": "Remove a curtida do usuário na postagem.",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Curtida removida" }
+        }
+      }
+    },
+    "/postagens/{id}/comentarios": {
+      "post": {
+        "tags": ["Interacoes"],
+        "summary": "Adicionar Comentário (RNF12)",
+        "description": "Comenta em uma publicação.",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComentarioRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Comentário salvo" }
+        }
+      }
+    },
+    "/postagens/{post_id}/comentarios/{comentario_id}": {
+      "delete": {
+        "tags": ["Interacoes"],
+        "summary": "Excluir Comentário (RNF13, RNF14)",
+        "description": "Remove um comentário. Permissão concedida ao autor do comentário (RNF13) OU ao dono da postagem (RNF14).",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "comentario_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Comentário excluído" },
+          "403": { "description": "Acesso negado" }
+        }
+      }
+    }
+  }
+}
