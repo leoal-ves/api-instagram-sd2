@@ -717,7 +717,7 @@
             "type": "string",
             "example": "1"
           },
-          "nome_completo": {
+          "nome": {
             "type": "string",
             "example": "João da Silva"
           },
