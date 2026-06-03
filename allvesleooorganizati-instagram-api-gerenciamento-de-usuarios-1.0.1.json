@@ -216,6 +216,70 @@
           }
         ]
       },
+      "post":{
+        "tags": ["posts"]
+      },
+      "summary": "Incluir curtida",
+      "description": "Adiciona uma curtida a um post específico.",
+      "operationId": "curtirPost",
+      "parameters": [
+        {
+          "name": "id-usuario",
+          "in": "path",
+          "description": "ID do usuário que irá curtir o post",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }        },
+        {
+          "name": "id-post",
+          "in": "path",
+          "description": "ID do post a ser curtido",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Post curtido com sucesso",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sucesso"
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "Dados incompletos",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ErroResponse"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "Token inválido ou expirado",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ErroResponse"
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "Acesso negado",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ErroResponse"
+              }
+            }         },
       "patch": {
       "tags": [
         "posts"
