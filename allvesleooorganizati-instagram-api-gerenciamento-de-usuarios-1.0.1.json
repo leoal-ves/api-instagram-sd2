@@ -23,9 +23,14 @@
     {
       "name":"posts",
       "description": "Operações relacionadas a posts"
+    },
+    {
+      "name": "curtidas",
+      "description": "Operações relacionadas a curtidas"
     }
   ],
   "paths": {
+    
     "/usuarios/posts":{
        "post": {
         "tags": [
@@ -141,6 +146,7 @@
     
     },
     "/usuarios/{id-usuario}/posts/{id-post}": {
+      
       "get": {
         "tags": [
           "posts"
@@ -217,148 +223,59 @@
         ]
       },
       "post":{
-        "tags": ["posts"]
+        "tags": ["posts"],
+        "summary": "Curtir Post",
+        "description": "Inclui uma curtida no post especificado.",
+        "operationId": "curtirPost",
+        "requestBody": {
+          "description": "Dados do post a ser criado",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CurtidaResponse"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Curtida adicionada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurtidaResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
       },
-      "summary": "Incluir curtida",
-      "description": "Adiciona uma curtida a um post específico.",
-      "operationId": "curtirPost",
-      "parameters": [
-        {
-          "name": "id-usuario",
-          "in": "path",
-          "description": "ID do usuário que irá curtir o post",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }        },
-        {
-          "name": "id-post",
-          "in": "path",
-          "description": "ID do post a ser curtido",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "responses": {
-        "200": {
-          "description": "Post curtido com sucesso",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Sucesso"
-              }
-            }
-          }
-        },
-        "400": {
-          "description": "Dados incompletos",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ErroResponse"
-              }
-            }
-          }
-        },
-        "401": {
-          "description": "Token inválido ou expirado",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ErroResponse"
-              }
-            }
-          }
-        },
-        "403": {
-          "description": "Acesso negado",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ErroResponse"
-              }
-            }         },
-      "patch": {
-      "tags": [
-        "posts"
-      ],
-      "summary": "Atualizar post",
-      "description": "Atualiza completamente os dados de um post pelo ID.",
-      "operationId": "atualizarPost",
-      "parameters": [
-        {
-          "name": "id",
-          "in": "path",
-          "description": "ID do post",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "requestBody": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/CriaçãoPostRequest"
-            },
-            "example": {
-              "conteudo": "Meu novo post atualizado!"
-            }
-          }
-        },
-        "required": true
-      },
-      "responses": {
-        "200": {
-          "description": "Post atualizado com sucesso",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Sucesso"
-              }
-            }
-          }
-        },
-        "400": {
-          "description": "Dados incompletos",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ErroResponse"
-              }
-            }
-          }
-        },
-        "401": {
-          "description": "Token inválido ou expirado",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ErroResponse"
-              }
-            }
-          }
-        },
-        "404": {
-          "description": "Post não encontrado",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ErroResponse"
-              }
-            }
-          }
-        }
-      },
-      "security": [
-        {
-          "BearerAuth": []
-        }
-      ]
-    },
   "delete": {
       "tags": [
         "posts"
@@ -851,6 +768,23 @@
   },
   "components": {
     "schemas": {
+      "CurtidaResponse": {
+        "type": "object",
+        "properties": {
+          "id_usuario": {
+            "type": "string",
+            "example": "1"
+          },
+          "id_post": {
+            "type": "string",
+            "example": "1"
+          }
+        },
+        "required": [
+          "id_usuario",
+          "id_post"
+        ]
+      },
       "Sucesso":{
         "example": {
           "status": "sucesso",
