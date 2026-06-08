@@ -27,41 +27,21 @@
   ],
   "paths": {
     
-    "/usuarios/posts":{
+    "/usuarios/{id-usuario}/posts": {
       "get": {
         "tags": [
           "posts"
         ],
-        "summary": "Obter detalhes de um post",
-        "description": "Retorna os detalhes de um post específico baseado no ID fornecido.",
-        "operationId": "obterPostPorId",
-        "parameters": [
-          {
-            "name": "id-usuario",
-            "in": "path",
-            "description": "ID do usuário dono do post",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id-post",
-            "in": "path",
-            "description": "ID do post a ser recuperado",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "summary": "Listar posts",
+        "description": "Retorna a lista de posts cadastrados.",
+        "operationId": "listarPosts",
         "responses": {
           "200": {
-            "description": "Post encontrado com sucesso",
+            "description": "Posts listados com sucesso",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CriaçãoPostRequest"
+                  "$ref": "#/components/schemas/ListagemPostsResponse"
                 }
               }
             }
@@ -76,18 +56,8 @@
               }
             }
           },
-          "403": {
-            "description": "Acesso negado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErroResponse"
-                }
-              }
-            }
-          },
           "404": {
-            "description": "Post não encontrado",
+            "description": "Nenhum post encontrado",
             "content": {
               "application/json": {
                 "schema": {
@@ -102,8 +72,7 @@
             "BearerAuth": []
           }
         ]
-      },
-       "post": {
+      }, "post": {
         "tags": [
           "posts"
         ],
@@ -165,50 +134,7 @@
               }
             }
           }
-        }
-      }
-    },
-    "/usuarios/{id-usuario}/posts": {
-      "get": {
-        "tags": [
-          "posts"
-        ],
-        "summary": "Listar posts",
-        "description": "Retorna a lista de posts cadastrados.",
-        "operationId": "listarPosts",
-        "responses": {
-          "200": {
-            "description": "Posts listados com sucesso",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ListagemPostsResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Token inválido ou expirado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErroResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Nenhum post encontrado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErroResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
+        },"security": [
           {
             "BearerAuth": []
           }
@@ -273,7 +199,6 @@
           }
         ]
       },
-      
       "patch": {
         "tags": ["posts"],
         "summary": "Atualizar post",
@@ -403,6 +328,74 @@
       ]
     }
     },
+    "delete": {
+      "tags": [
+        "posts"
+      ],
+      "summary": "Deletar post",
+      "description": "Remove um post do sistema pelo ID.",
+      "operationId": "deletarPost",
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "ID do post",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Post deletado com sucesso",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sucesso"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "Token inválido ou expirado",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ErroResponse"
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "Acesso negado",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ErroResponse"
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "Post não encontrado",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ErroResponse"
+              }
+            }
+          }
+        }
+      },
+      "security": [
+        {
+          "BearerAuth": []
+        }
+      ]
+    }
+    }
+  ,
     "/usuarios/login": {
       "post": {
         "tags": [
@@ -825,9 +818,9 @@
         ]
       }
     }
-  }},
+  },
   "components": {
-        "schemas": {
+    "schemas": {
       "CurtidaResponse": {
         "type": "object",
         "properties": {
@@ -874,15 +867,14 @@
           "status": "sucesso",
           "codigo": "LISTAGEM_POSTS_SUCESSO",
           "mensagem": "Posts listados com sucesso",
-          "dados": {
-            "posts": [
+          "posts": [
               {
                 "id": "1",
                 "conteudo": "Meu primeiro post!",
-                "data_criacao": "2024-01-01T12:00:00Z"
+                "imagem": "post1.jpg"
               }
             ]
-          }
+          
         },
         "allOf": [
           {
@@ -1177,6 +1169,6 @@
         "bearerFormat": "JWT"
       }
     }
-  }
+  }}
 
-}
+
