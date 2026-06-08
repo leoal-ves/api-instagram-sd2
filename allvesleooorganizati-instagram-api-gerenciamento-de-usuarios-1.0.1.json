@@ -167,7 +167,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CurtidaResponse"
+                  "$ref": "#/components/schemas/Sucesso"
                 }
               }
             }
@@ -218,7 +218,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CriaçãoPostRequest" }
+                "$ref": "#/components/schemas/AtualizacaoPostRequest" }
               }},
           "required": true
       }, "responses": {
@@ -260,73 +260,13 @@
                 "$ref": "#/components/schemas/ErroResponse"
               }
       }
-      }}},
-  "delete": {
-      "tags": [
-        "posts"
-      ],
-      "summary": "Deletar post",
-      "description": "Remove um post do sistema pelo ID.",
-      "operationId": "deletarPost",
-      "parameters": [
-        {
-          "name": "id",
-          "in": "path",
-          "description": "ID do post",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "responses": {
-        "200": {
-          "description": "Post deletado com sucesso",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Sucesso"
-              }
-            }
-          }
-        },
-        "401": {
-          "description": "Token inválido ou expirado",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ErroResponse"
-              }
-            }
-          }
-        },
-        "403": {
-          "description": "Acesso negado",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ErroResponse"
-              }
-            }
-          }
-        },
-        "404": {
-          "description": "Post não encontrado",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ErroResponse"
-              }
-            }
-          }
-        }
-      },
+      }
+    }},
       "security": [
         {
           "BearerAuth": []
         }
       ]
-    }
     },
     "delete": {
       "tags": [
@@ -821,6 +761,22 @@
   },
   "components": {
     "schemas": {
+      "AtualizacaoPostRequest": {
+        "type": "object",
+        "properties": {
+          "legenda": {
+            "type": "string",
+            "example": "Meu post atualizado!",
+            "maxLength": 200,
+            "description": "Texto que acompanha a imagem do post",
+            "minLength": 5
+
+          }
+        },
+        "required": [
+          "legenda"
+        ]
+      },
       "CurtidaResponse": {
         "type": "object",
         "properties": {
@@ -853,12 +809,21 @@
       "CriaçãoPostRequest": {
         "type": "object",
         "properties": {
+          "imagem": {
+            "type": "string",
+            "description": "string Base64"
+          },
           "legenda": {
             "type": "string",
-            "example": "Meu novo post!"
+            "example": "Meu novo post!",
+            "maxLength": 200,
+            "description": "Texto que acompanha a imagem do post",
+            "minLength": 5
+
           }
         },
         "required": [
+          "imagem",
           "legenda"
         ]
       },
@@ -871,7 +836,7 @@
               {
                 "id": "1",
                 "conteudo": "Meu primeiro post!",
-                "imagem": "post1.jpg"
+                "imagem": "post1.jpg(BASE64)"
               }
             ]
           
