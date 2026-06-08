@@ -23,15 +23,86 @@
     {
       "name":"posts",
       "description": "Operações relacionadas a posts"
-    },
-    {
-      "name": "curtidas",
-      "description": "Operações relacionadas a curtidas"
     }
   ],
   "paths": {
     
     "/usuarios/posts":{
+      "get": {
+        "tags": [
+          "posts"
+        ],
+        "summary": "Obter detalhes de um post",
+        "description": "Retorna os detalhes de um post específico baseado no ID fornecido.",
+        "operationId": "obterPostPorId",
+        "parameters": [
+          {
+            "name": "id-usuario",
+            "in": "path",
+            "description": "ID do usuário dono do post",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id-post",
+            "in": "path",
+            "description": "ID do post a ser recuperado",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Post encontrado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CriaçãoPostRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Post não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
        "post": {
         "tags": [
           "posts"
@@ -47,7 +118,7 @@
               },
               "example": {
                 "imagem": "post1.jpg",
-                "conteudo": "Meu novo post!"
+                "legenda": "Meu novo post!"
               }
             }
           },
@@ -147,81 +218,7 @@
     },
     "/usuarios/{id-usuario}/posts/{id-post}": {
       
-      "get": {
-        "tags": [
-          "posts"
-        ],
-        "summary": "Obter detalhes de um post",
-        "description": "Retorna os detalhes de um post específico baseado no ID fornecido.",
-        "operationId": "obterPostPorId",
-        "parameters": [
-          {
-            "name": "id-usuario",
-            "in": "path",
-            "description": "ID do usuário dono do post",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id-post",
-            "in": "path",
-            "description": "ID do post a ser recuperado",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Post encontrado com sucesso",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CriaçãoPostRequest"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Token inválido ou expirado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErroResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Acesso negado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErroResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Post não encontrado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErroResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      },
+      
       "post":{
         "tags": ["posts"],
         "summary": "Curtir Post",
@@ -276,6 +273,69 @@
           }
         ]
       },
+      
+      "patch": {
+        "tags": ["posts"],
+        "summary": "Atualizar post",
+        "description": "Atualiza completamente os dados de um post pelo ID.",
+        "operationId": "atualizarPost",
+        "parameters": [
+          {
+            "name": "id-usuario",
+            "in": "path",
+            "description": "ID do usuário dono do post",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CriaçãoPostRequest" }
+              }},
+          "required": true
+      }, "responses": {
+      "200":{
+          "description": "Post atualizado com sucesso",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sucesso"
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "Dados incompletos",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ErroResponse"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "Token inválido ou expirado",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ErroResponse"
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "Post não encontrado",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ErroResponse"
+              }
+      }
+      }}},
   "delete": {
       "tags": [
         "posts"
@@ -765,9 +825,9 @@
         ]
       }
     }
-  },
+  }},
   "components": {
-    "schemas": {
+        "schemas": {
       "CurtidaResponse": {
         "type": "object",
         "properties": {
@@ -800,13 +860,13 @@
       "CriaçãoPostRequest": {
         "type": "object",
         "properties": {
-          "conteudo": {
+          "legenda": {
             "type": "string",
             "example": "Meu novo post!"
           }
         },
         "required": [
-          "conteudo"
+          "legenda"
         ]
       },
       "ListagemPostsResponse": {
@@ -1118,4 +1178,5 @@
       }
     }
   }
+
 }
