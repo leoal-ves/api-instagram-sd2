@@ -277,9 +277,17 @@
       "operationId": "deletarPost",
       "parameters": [
         {
-          "name": "id",
+          "name": "id-post",
           "in": "path",
           "description": "ID do post",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },{
+          "name": "id-usuario",
+          "in": "path",
+          "description": "ID do usuário dono do post",
           "required": true,
           "schema": {
             "type": "string"
@@ -334,8 +342,7 @@
         }
       ]
     }
-    }
-  ,
+    },
     "/usuarios/login": {
       "post": {
         "tags": [
@@ -836,7 +843,8 @@
               {
                 "id": "1",
                 "conteudo": "Meu primeiro post!",
-                "imagem": "post1.jpg(BASE64)"
+                "imagem": "post1.jpg(BASE64)",
+                "curtidas":"10"
               }
             ]
           
