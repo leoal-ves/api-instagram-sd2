@@ -150,17 +150,6 @@
         "summary": "Curtir Post",
         "description": "Inclui uma curtida no post especificado.",
         "operationId": "curtirPost",
-        "requestBody": {
-          "description": "Dados do post a ser criado",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CurtidaResponse"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
           "201": {
             "description": "Curtida adicionada com sucesso",
@@ -784,23 +773,7 @@
           "legenda"
         ]
       },
-      "CurtidaResponse": {
-        "type": "object",
-        "properties": {
-          "id_usuario": {
-            "type": "string",
-            "example": "1"
-          },
-          "id_post": {
-            "type": "string",
-            "example": "1"
-          }
-        },
-        "required": [
-          "id_usuario",
-          "id_post"
-        ]
-      },
+      
       "Sucesso":{
         "example": {
           "status": "sucesso",
@@ -842,7 +815,7 @@
           "posts": [
               {
                 "id": "1",
-                "conteudo": "Meu primeiro post!",
+                "legenda": "Meu primeiro post!",
                 "imagem": "post1.jpg(BASE64)",
                 "curtidas":"10"
               }
