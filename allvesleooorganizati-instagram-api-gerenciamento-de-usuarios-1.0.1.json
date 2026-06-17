@@ -143,6 +143,77 @@
     
     },
     "/usuarios/{id-usuario}/posts/{id-post}": {
+      "get":{
+        "tags": ["posts"],
+        "summary": "Obter dados de um post",
+        "description": "Retorna os detalhes de um post específico baseado no ID fornecido.",
+        "operationId": "obterPostPorId",
+        "parameters": [
+          {
+            "name": "id-usuario",
+            "in": "path",
+            "description": "ID do usuário dono do post",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+      },
+    { 
+      "name":"id-post",   
+      "in":"path",
+      "required":true,
+      "schema":{
+        "type":"string",
+        "description":"ID do post a ser recuperado"
+}}],
+        "responses": {
+          "200": {
+            "description": "Post encontrado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostSchema"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Post não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
       
       
       "post":{
@@ -786,6 +857,24 @@
           }
         ] 
       },
+      "PostSchema": {
+        "type": "object",
+        "properties": {
+          "legenda": {
+            "type": "string",
+            "example": "Meu primeiro post!"
+          },
+          "imagem": {
+            "type": "string",
+            "description": "string Base64"
+          },
+          "curtidas":{
+            "type":"string",
+            "example":"10"
+          }
+        }
+      }
+      ,
       "CriaçãoPostRequest": {
         "type": "object",
         "properties": {
